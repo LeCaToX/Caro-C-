@@ -135,14 +135,14 @@ int countRows(char c, int ignore) {
     string valid1 = ".", valid2 = ".";
     for (int i = 0; i < validLength; i++) valid1 += c, valid2 = c + valid2;
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < BOARD_SIZE; i++) {
 
         // Current row
         string curRow = "";
-        /*for (int j = 0; j < BOARD_SIZE; j++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
             if (board[i][j] == c) curRow += c;
             else curRow += '.';
-        }*/
+        }
 
         //Count valid substring 1 in current row
         int curIndex = 0;
@@ -156,6 +156,37 @@ int countRows(char c, int ignore) {
         while (curIndex != string::npos) {
             cnt++;
             curIndex = curRow.find(valid2,curIndex+1);
+        }
+    }
+    return cnt;
+}
+
+int countColumns(char c, int ignore) {
+    int cnt = 0, validLength = 5 -  ignore;
+    string valid1 = ".", valid2 = ".";
+    for (int i = 0; i < validLength; i++) valid1 += c, valid2 = c + valid2;
+
+    for (int i = 0; i < BOARD_SIZE; i++) {
+
+        // Current column
+        string curColumn = "";
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (board[j][i] == c) curColumn += c;
+            else curColumn += '.';
+        }
+
+        //Count valid substring 1 in current row
+        int curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curColumn.find(valid1,curIndex+1);
+        }
+
+        // Count valid substring 2 in current row
+        curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curColumn.find(valid2,curIndex+1);
         }
     }
     return cnt;
