@@ -98,7 +98,7 @@ void makeMove(int row, int col, char playerSymbol) {
     board[row][col] = playerSymbol;
 }
 
-void singleMode() {
+void multiMode() {
     int currentPlayer = 1, playerChoice;
     bool gameWon = false;
     bool gameTied = false;
@@ -120,9 +120,11 @@ void singleMode() {
         if (checkWin(playerSymbol)) {
             gameWon = true;
             cout << "Player " << currentPlayer << " wins!" << endl;
+            return;
         } else if (checkTie()) {
             gameTied = true;
             cout << "Game tied!" << endl;
+            return;
         } else {
             currentPlayer = (currentPlayer == 1) ? 2 : 1;
         }
@@ -144,14 +146,14 @@ int countRows(char c, int ignore) {
             else curRow += '.';
         }
 
-        //Count valid substring 1 in current row
+        //Count valid substring type 1 in current row
         int curIndex = 0;
         while (curIndex != string::npos) {
             cnt++;
             curIndex = curRow.find(valid1,curIndex+1);
         }
 
-        // Count valid substring 2 in current row
+        // Count valid substring type 2 in current row
         curIndex = 0;
         while (curIndex != string::npos) {
             cnt++;
@@ -175,14 +177,14 @@ int countColumns(char c, int ignore) {
             else curColumn += '.';
         }
 
-        //Count valid substring 1 in current row
+        //Count valid substrings type 1 in current column
         int curIndex = 0;
         while (curIndex != string::npos) {
             cnt++;
             curIndex = curColumn.find(valid1,curIndex+1);
         }
 
-        // Count valid substring 2 in current row
+        // Count valid substrings type 2 in current column
         curIndex = 0;
         while (curIndex != string::npos) {
             cnt++;
@@ -192,7 +194,19 @@ int countColumns(char c, int ignore) {
     return cnt;
 }
 
-void multiMode() {
+int countAll(char c, int ignore) {
+    return countRows(c,ignore)+countColumns(c,ignore);
+}
+
+double evaluateScore(char prevTurn) {
+    int ignoreOne = countAll(prevTurn,1);
+    int ignoreTwo = countAll(prevTurn,2);
+    int ignoreThree = countAll(prevTurn,3);
+    double score = ignoreOne*100.0+ignoreTwo*5.0+ignoreThree*1.0;
+    return score;
+}
+
+void singleMode() {
 
 }
 
@@ -205,13 +219,13 @@ void startGame() {
     cin >> playerChoice;
     if (playerChoice == 2) {
         system("cls");
-        singleMode();
+        multiMode();
     }
-    else multiMode();
+    else singleMode();
+    return;
 }
 
 signed main() {
-    cout << countRows('X',1);
-    //startGame();
+    startGame();
     return 0;
 }
