@@ -92,8 +92,6 @@ void getPlayerMove(int currentPlayer, int& row, int& col) {
     cout << "Player" << currentPlayer << " enter row and column (0-"
          << BOARD_SIZE - 1 << "): ";
     cin >> row >> col;
-    // row--;
-    // col--;
 }
 
 void makeMove(int row, int col, char playerSymbol) {
