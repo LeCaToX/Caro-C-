@@ -7,6 +7,7 @@ const char EMPTY_CELL = '-';
 const char PLAYER_1_SYMBOL = 'X';
 const char PLAYER_2_SYMBOL = 'O';
 
+int currentPlayer;
 vector<vector<char>> board(BOARD_SIZE, vector<char>(BOARD_SIZE, EMPTY_CELL));
 
 void printBoard() {
@@ -194,16 +195,122 @@ int countColumns(char c, int ignore) {
     return cnt;
 }
 
-int countAll(char c, int ignore) {
-    return countRows(c,ignore)+countColumns(c,ignore);
+int countDiagonals(char c, int ignore) {
+    int cnt = 0, validLength = 5 -  ignore;
+    string valid1 = ".", valid2 = ".";
+    for (int i = 0; i < validLength; i++) valid1 += c, valid2 = c + valid2;
+
+    // Count the main diagonals
+    for (int i = 0; i <= BOARD_SIZE - validLength; i++) {
+        // Current main diagonal
+        string curDiag = "";
+        for (int j = 0; j < BOARD_SIZE - i; j++) {
+            if (board[j][j + i] == c) curDiag += c;
+            else curDiag += '.';
+        }
+
+        //Count valid substrings type 1 in current main diagonal
+        int curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curDiag.find(valid1,curIndex+1);
+        }
+
+        // Count valid substrings type 2 in current main diagonal
+        curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curDiag.find(valid2,curIndex+1);
+        }
+    }
+
+    // Count the anti-diagonals
+    for (int i = 0; i <= BOARD_SIZE - validLength; i++) {
+        // Current anti-diagonal
+        string curDiag = "";
+        for (int j = 0; j < BOARD_SIZE - i; j++) {
+            if (board[j][BOARD_SIZE - 1 - j - i] == c) curDiag += c;
+            else curDiag += '.';
+        }
+
+        //Count valid substrings type 1 in current anti-diagonal
+        int curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curDiag.find(valid1,curIndex+1);
+        }
+
+        // Count valid substrings type 2 in current anti-diagonal
+        curIndex = 0;
+        while (curIndex != string::npos) {
+            cnt++;
+            curIndex = curDiag.find(valid2,curIndex+1);
+        }
+    }
+    return cnt;
 }
 
+int countAll(char c, int ignore) {
+    return countRows(c,ignore)+countColumns(c,ignore)+countDiagonals(c,ignore);
+}
+
+// Evaluate score for each state of the game
 double evaluateScore(char prevTurn) {
     int ignoreOne = countAll(prevTurn,1);
     int ignoreTwo = countAll(prevTurn,2);
     int ignoreThree = countAll(prevTurn,3);
     double score = ignoreOne*100.0+ignoreTwo*5.0+ignoreThree*1.0;
     return score;
+}
+
+vector<pair<int,int>> getPlaces(char c) {
+    vector<pair<int,int>> ans;
+    for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+    if (board[i][j] == c) ans.push_back({i,j});
+    return ans;
+}
+
+vector<pair<int,int>> availableMove(int i, int j) {
+    vector<pair<int,int>> ans;
+    // Define the possible directions as arrays of offsets
+    int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    for (int k = 0; k < 8; k++) {
+        // Next pos
+        int x = i + dx[k];
+        int y = j + dy[k];
+        // Check if the next position is valid
+        if (x >= 0 && x < 10 && y >= 0 && y < 10 && board[x][y] == '.')
+            ans.push_back({x, y});
+
+    }
+    return ans;
+}
+
+pair<double,pair<int,int>> minimax(int d, double alpha, double beta) {
+    vector<pair<int,int>> moveList,places;
+    set<pair<int,int>> uniqueMove;
+    char cur = (currentPlayer == 1 ? 'O' : 'X');
+    places = (getPlaces(cur));
+    // Get all unique move for next player
+    for (int i = 0; i < places.size(); i++) {
+        vector<pair<int,int>> all = availableMove(places[i].first,places[i].second);
+        for (auto x: all) uniqueMove.insert(x);
+    }
+    if (uniqueMove.empty()) {
+
+    } else for (auto i: uniqueMove) moveList.push_back(i);
+    //Minimax
+    double bestScore;
+    double tempScore;
+    pair<int,int> bestMove;
+    if (!d) return {evaluateScore(cur),moveList[0]};
+    bestScore = alpha;
+    while (!moveList.empty()) {
+
+    }
+    return {bestScore,bestMove};
 }
 
 void singleMode() {
